@@ -44,14 +44,13 @@ public class CircuitBoard {
 	 */
 	public CircuitBoard(String filename) throws FileNotFoundException {
 		Scanner fileScan = new Scanner(new File(filename));
-		int numStarts = 0;	
+		int numStarts = 0;
 		int numEnds = 0;
 
 		try {
 			//get ROWS and COLS from first line and initialize
-			String firstLine = fileScan.nextLine();
-			String[] dimensions = firstLine.split("\\s+");
-			if (dimensions.length < 2) { 
+			String[] dimensions = fileScan.nextLine().split("\\s+");
+			if (dimensions.length != 2) { 
 				throw new InvalidFileFormatException("First line of file must contain two integers for number of rows and columns in grid");
 			}
 			try {
@@ -98,7 +97,6 @@ public class CircuitBoard {
 			if (numStarts != 1 || numEnds != 1) {
 				throw new InvalidFileFormatException("Board must contain exactly one '1' for the starting point and one '2' for the ending point");
 			}
-
 		} finally {
 			fileScan.close();
 		}
@@ -195,5 +193,4 @@ public class CircuitBoard {
 		}
 		return str.toString();
 	}
-	
 }// class CircuitBoard

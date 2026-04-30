@@ -41,8 +41,11 @@ public class CircuitTracer {
 	 * @param args command line arguments passed through from main()
 	 */
 	public CircuitTracer(String[] args) {
-		//parse and validate command line args
+		//validate command line args
 		if (args.length != 3) {
+			printUsage();
+			return;
+		} else if (!args[0].equals("-s") && !args[0].equals("-q")) {
 			printUsage();
 			return;
 		} else if (!args[1].equals("-c") && !args[1].equals("-g")) {
@@ -50,31 +53,26 @@ public class CircuitTracer {
 			return;
 		} 
 
-		//initialize the Storage to use either a stack or queue based on args[0] or print usage if invalid args[0]
-		if (args[0].equals("-s")) {	
+		//initialize the Storage to use either stack or queue based on args[0]
+		if (args[0].equals("-s")) { 
 			stateStore = new Storage<TraceState>(Storage.DataStructure.stack);
-		} else if (args[0].equals("-q")) {	
+		} else {	
 			stateStore = new Storage<TraceState>(Storage.DataStructure.queue);
-		} else { //invalid arg
-			printUsage();
-			return;
-		}
+		} 
 
 		//read in the CircuitBoard from the given file or print usage if file isn't found
-		CircuitBoard board;
+		CircuitBoard board; 
 		try {
 			board = new CircuitBoard(args[2]);
 		} catch (Exception e) { //invalid file name
 			System.out.println(e.toString());
-			// printUsage(); ////////////////////////////////////////////////////////////////
 			return;
 		}
 
 		//add initial traceState objects for each open path around the start
-		bestPaths = new ArrayList<TraceState>();
 		Point start = new Point(board.getStartingPoint());
-		int startRow = start.x;
-		int startCol = start.y;
+		int startRow = start.x; 
+		int startCol = start.y; 
 
 		if (board.isOpen(startRow, startCol + 1)) { /////////////////////// Switch around order perhaps to see if it changes the effeciency of either stack or queue
 			TraceState initialRight = new TraceState(board, startRow, startCol + 1);
@@ -94,10 +92,11 @@ public class CircuitTracer {
 		}
 
 		//run the search for best paths
+		bestPaths = new ArrayList<TraceState>(); 
 		while(!stateStore.isEmpty()) {
 			TraceState currentState = stateStore.retrieve();
 
-			//check if current TraceState is equal to current best or best, otherwise generate possible paths from current TraceState and store
+			//check if current TraceState is best or equal to current best, otherwise generate possible paths from current TraceState and store
 			if (currentState.isSolution()) { 
 				if (bestPaths.isEmpty() || bestPaths.get(0).pathLength() == currentState.pathLength()) {
 					bestPaths.add(currentState);
@@ -135,5 +134,4 @@ public class CircuitTracer {
 			}
 		}
 	}
-	
 } // class CircuitTracer
