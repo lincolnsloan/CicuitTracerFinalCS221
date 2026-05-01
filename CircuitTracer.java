@@ -74,7 +74,7 @@ public class CircuitTracer {
 		int startRow = start.x; 
 		int startCol = start.y; 
 
-		if (board.isOpen(startRow, startCol + 1)) { /////////////////////// Switch around order perhaps to see if it changes the effeciency of either stack or queue
+		if (board.isOpen(startRow, startCol + 1)) { 
 			TraceState initialRight = new TraceState(board, startRow, startCol + 1);
 			stateStore.store(initialRight);
 		} 
@@ -108,7 +108,7 @@ public class CircuitTracer {
 				int currentRow = currentState.getRow();
 				int currentCol = currentState.getCol();
 
-				if (currentState.isOpen(currentRow, currentCol + 1)) { /////////////////////// Switch around order perhaps to see if it changes the effeciency of either stack or queue
+				if (currentState.isOpen(currentRow, currentCol + 1)) { 
 					TraceState currentStateRight = new TraceState(currentState, currentRow, currentCol + 1);
 					stateStore.store(currentStateRight);
 				} 
@@ -127,10 +127,16 @@ public class CircuitTracer {
 			}
 		}
 
-		//output results to console
+		//output results to the console if arg[1] is -c, otherwise to the GUI
 		if (args[1].equals("-c")) {
 			for (int i = 0; i < bestPaths.size(); i ++) {
 				System.out.println(bestPaths.get(i).toString());
+			}
+		} else {
+			try {
+				CircuitTracerGUI.show(board, bestPaths);
+			} catch (Exception e) {
+				System.out.println("GUI is not available in this environment.");
 			}
 		}
 	}
