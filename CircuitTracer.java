@@ -69,11 +69,34 @@ public class CircuitTracer {
 			return;
 		}
 
+		if (args[0].equals("-q")) { 
+			bestPaths = queueAlgorithm(board);
+		} else {	
+			System.out.println("ERRRRRRRR");
+		} 
+
+		//output results to the console if arg[1] is -c, otherwise to the GUI
+		if (args[1].equals("-c")) {
+			for (int i = 0; i < bestPaths.size(); i ++) {
+				System.out.println(bestPaths.get(i).toString());
+			}
+		} else {
+			try {
+				CircuitTracerGUI.show(board, bestPaths);
+			} catch (Exception e) {
+				System.out.println("GUI is not available in this environment.");
+			}
+		}
+	}
+
+	public ArrayList<TraceState> queueAlgorithm(CircuitBoard board) {
 		//add initial traceState objects for each open path around the start
 		Point start = new Point(board.getStartingPoint());
 		int startRow = start.x; 
 		int startCol = start.y; 
-
+		ArrayList<TraceState> bestPaths = new ArrayList<TraceState>(); 
+		
+		
 		if (board.isOpen(startRow, startCol + 1)) { 
 			TraceState initialRight = new TraceState(board, startRow, startCol + 1);
 			stateStore.store(initialRight);
@@ -92,22 +115,22 @@ public class CircuitTracer {
 		}
 
 		//run the search for best paths
-		bestPaths = new ArrayList<TraceState>(); 
 		while(!stateStore.isEmpty()) {
 			TraceState currentState = stateStore.retrieve();
 
 			//check if current TraceState is best or equal to current best, otherwise generate possible paths from current TraceState and store
-			if (currentState.isSolution()) { 
-				if (bestPaths.isEmpty() || bestPaths.get(0).pathLength() == currentState.pathLength()) {
-					bestPaths.add(currentState);
-				} else if (currentState.pathLength() < bestPaths.get(0).pathLength()) {
-					bestPaths.clear();
-					bestPaths.add(currentState);
+			if (!bestPaths.isEmpty() && currentState.pathLength() > bestPaths.get(0).pathLength()) {
+				//empty stateStore
+				while(!stateStore.isEmpty()) {
+					stateStore.retrieve();
 				}
+			} else if (currentState.isSolution()) { 
+				bestPaths.add(currentState);
 			} else { 
 				int currentRow = currentState.getRow();
 				int currentCol = currentState.getCol();
 
+				
 				if (currentState.isOpen(currentRow, currentCol + 1)) { 
 					TraceState currentStateRight = new TraceState(currentState, currentRow, currentCol + 1);
 					stateStore.store(currentStateRight);
@@ -127,17 +150,6 @@ public class CircuitTracer {
 			}
 		}
 
-		//output results to the console if arg[1] is -c, otherwise to the GUI
-		if (args[1].equals("-c")) {
-			for (int i = 0; i < bestPaths.size(); i ++) {
-				System.out.println(bestPaths.get(i).toString());
-			}
-		} else {
-			try {
-				CircuitTracerGUI.show(board, bestPaths);
-			} catch (Exception e) {
-				System.out.println("GUI is not available in this environment.");
-			}
-		}
+		return bestPaths;
 	}
 } // class CircuitTracer
